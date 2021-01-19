@@ -20,7 +20,7 @@
         am4core.ready(function() {
         
             // Themes begin
-            am4core.useTheme(am4themes_dataviz);
+            // am4core.useTheme(am4themes_dataviz);
             am4core.useTheme(am4themes_animated);
             // Themes end
             
@@ -43,8 +43,17 @@
             polygonSeries.useGeodata = true;
             polygonSeries.nonScalingStroke = true;
             polygonSeries.strokeWidth = 0.5;
-            polygonSeries.calculateVisualCenter = true;
-            
+            polygonSeries.calculateVisualCenter = true;            
+
+            var polygonTemplate = polygonSeries.mapPolygons.template;
+            polygonTemplate.fill = am4core.color("#3b3b3b");
+            polygonTemplate.stroke = am4core.color("#000000"); 
+            polygonTemplate.strokeOpacity = 0.25;
+
+            // Create hover state and set alternative fill color
+            var hoverState = polygonTemplate.states.create("hover");
+            hoverState.properties.fill = am4core.color("#000000");
+
             var imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.data = mapData;
             imageSeries.dataFields.value = "value";                 // 'value' = investors per country... see file InvestorsPerCountry.js
@@ -52,19 +61,19 @@
             var imageTemplate = imageSeries.mapImages.template;
             imageTemplate.nonScaling = true
             
-            // Circle with country and number of investors text
+            // Circle with text: country and number of investors
             var circle = imageTemplate.createChild(am4core.Circle);
-            circle.fillOpacity = 0.7;
+            circle.fillOpacity = 0.7;            
             circle.propertyFields.fill = "color";
-            circle.tooltipText = "{name}: [bold]{value}[/] investors";        // 'value'
-            
+            circle.tooltipText = "{name}: [bold]{value}[/] investors";        // 'value'      
+                        
             // Change size of circles 
             imageSeries.heatRules.push({
                 "target": circle,
                 "property": "radius",
-                "min": 1,
+                "min": 3,
                 "max": 40,
-                "dataField": "value"                                // 'value'
+                "dataField": "value"                                        // 'value'
             })
             
             imageTemplate.adapter.add("latitude", function(latitude, target) {
