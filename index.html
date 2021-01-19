@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number of nvestors per country</title>      
+    <!-- Resources -->
+    <link rel="stylesheet" type="text/css" href="./style.css" />
+    <script src="./InvestorsPerCountry.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/dataviz.js"></script>
+</head>
+
+<body>   
+<!-- Chart code -->
+    <script>
+        am4core.ready(function() {
+        
+            // Themes begin
+            am4core.useTheme(am4themes_dataviz);
+            am4core.useTheme(am4themes_animated);
+            // Themes end
+            
+            // Create map instance
+            var chart = am4core.create("chartdiv", am4maps.MapChart);
+            
+            // var title = chart.titles.create();
+            // title.text = "[bold font-size: 20]Population of the World in 2011[/]\nsource: Gapminder";
+            // title.textAlign = "middle";
+            
+            // Set map definition
+            chart.geodata = am4geodata_worldLow;
+            
+            // Set projection
+            chart.projection = new am4maps.projections.Miller();
+            
+            // Create map polygon series
+            var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+            polygonSeries.exclude = ["AQ"];                        // remove Antarctica
+            polygonSeries.useGeodata = true;
+            polygonSeries.nonScalingStroke = true;
+            polygonSeries.strokeWidth = 0.5;
+            polygonSeries.calculateVisualCenter = true;
+            
+            var imageSeries = chart.series.push(new am4maps.MapImageSeries());
+            imageSeries.data = mapData;
+            imageSeries.dataFields.value = "value";                 // 'value' = investors per country... see file InvestorsPerCountry.js
+            
+            var imageTemplate = imageSeries.mapImages.template;
+            imageTemplate.nonScaling = true
+            
+            // Circle with country and number of investors text
+            var circle = imageTemplate.createChild(am4core.Circle);
+            circle.fillOpacity = 0.7;
+            circle.propertyFields.fill = "color";
+            circle.tooltipText = "{name}: [bold]{value}[/] investors";        // 'value'
+            
+            // Change size of circles 
+            imageSeries.heatRules.push({
+                "target": circle,
+                "property": "radius",
+                "min": 1,
+                "max": 40,
+                "dataField": "value"                                // 'value'
+            })
+            
+            imageTemplate.adapter.add("latitude", function(latitude, target) {
+            var polygon = polygonSeries.getPolygonById(target.dataItem.dataContext.id);
+                if(polygon){
+                    return polygon.visualLatitude;
+                }
+            return latitude;
+            })
+            
+            imageTemplate.adapter.add("longitude", function(longitude, target) {
+            var polygon = polygonSeries.getPolygonById(target.dataItem.dataContext.id);
+                if(polygon){
+                    return polygon.visualLongitude;
+                }
+            return longitude;
+            })        
+        }); // end am4core.ready()
+    </script>
+
+    <!-- HTML -->
+    <div id="chartdiv"></div>
+    
+    </body>
+</html>
