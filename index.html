@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number of nvestors per country</title>      
+    <title>Number of Investors per country - with Circles</title>      
     <!-- Resources -->
     <link rel="stylesheet" type="text/css" href="./style.css" />
     <script src="./InvestorsPerCountry.js"></script>
@@ -54,6 +54,7 @@
             // Create hover state and set alternative fill color
             var hoverState = polygonTemplate.states.create("hover");
             hoverState.properties.fill = am4core.color("#000000");
+            hoverState.transitionDuration = 1400;
 
             var imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.data = mapData;
@@ -77,6 +78,7 @@
                 "dataField": "value"                                        // 'value'
             })
             
+            // this places circles at the visual center of a country
             imageTemplate.adapter.add("latitude", function(latitude, target) {
             var polygon = polygonSeries.getPolygonById(target.dataItem.dataContext.id);
                 if(polygon){
